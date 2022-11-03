@@ -20,7 +20,7 @@ headers = {
 
 data = []
 
-for page in range(0, 2):
+for page in range(0, 15):
     url = f'https://hh.ru/search/vacancy?text=python+разработчик&page={page}'
     resp = req.get(url, headers=headers)
     soup = BeautifulSoup(resp.text, 'lxml')
@@ -29,7 +29,6 @@ for page in range(0, 2):
         item_descr = dict()
         item_descr['title'] = item.text
         url = item['href']
-        print(url)
         resp = req.get(url, headers=headers)
         soup = BeautifulSoup(resp.text, 'lxml')
         salary = soup.find(attrs={'data-qa': 'vacancy-salary'})
@@ -37,11 +36,11 @@ for page in range(0, 2):
         region = soup.find(attrs={'data-qa': 'vacancy-view-raw-address'})
         location = soup.find(attrs={'data-qa': 'vacancy-view-location'})
         item_descr['work experience'] = work_exp.text if work_exp else ''
-        item_descr['salary'] = salary.text.replace(u'\xa0', u' ')
+        item_descr['salary'] = salary.text.replace(u'\xa0', u' ') if salary else ''
         item_descr['region'] = region.text.split(',')[0] if region else location.text.split(',')[0]
         data.append(item_descr)
         sleep(randint(2, 7))
-    sleep(10)
+    sleep(7)
 
-with open('data.json', 'w') as file:
+with open('data.json', 'w', encoding='utf8') as file:
     json.dump({'data': data}, file, ensure_ascii=False)
